@@ -13,25 +13,20 @@ class binance:
         self.APIkey = APIkey
         self.Secret = Secret
 
-    async def request_get(self, url, params, headers={}):
+    async def request(self, type, url, params, headers={}):
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params, headers=headers) as response:
-                return await response.json()
-
-    async def request_post(self, url, params, headers):
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, params=params, headers=headers) as response:
-                return await response.json()
-
-    async def request_delete(self, url, params, headers):
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(url, params=params, headers=headers) as response:
-                return await response.json()
-
-    async def request_put(self, url, params, headers):
-        async with aiohttp.ClientSession() as session:
-            async with session.put(url, params=params, headers=headers) as response:
-                return await response.json()
+            if type == 'GET':
+                async with session.get(url, params=params, headers=headers) as response:
+                    return await response.json()
+            elif type == 'POST':
+                async with session.post(url, params=params, headers=headers) as response:
+                    return await response.json()
+            elif type == 'DELETE':
+                async with session.delete(url, params=params, headers=headers) as response:
+                    return await response.json()
+            elif type == 'PUT':
+                async with session.put(url, params=params, headers=headers) as response:
+                    return await response.json()
 
     def api_query(self,command, params={}, reqType=None, privateAPI=False, signed=False):
 
@@ -43,10 +38,10 @@ class binance:
         recvWindow = 5000
         if privateAPI == False:
             url = urlPublic + command
-            ret = self.request_get(url, params=params)
+            ret = self.request('GET', url, params=params)
         elif privateAPI == True and signed == False:
             url = urlPrivate + command
-            ret = self.request_get(url, params=params)
+            ret = self.request('GET', url, params=params)
         elif signed == True:
             url = urlPrivate + command
             params['timestamp'] = timestamp
@@ -55,14 +50,7 @@ class binance:
             sign = hmac.new(self.Secret.encode('UTF-8'), query_string.encode('UTF-8'), hashlib.sha256)
             params['signature'] = sign.hexdigest()
             headers = {'X-MBX-APIKEY': self.APIkey}
-            if reqType == 'GET':
-                ret = self.request_get(url, params=params, headers=headers)
-            elif reqType == 'POST':
-                ret = self.request_post(url, params=params, headers=headers)
-            elif reqType == 'DELETE':
-                ret = self.request_delete(url, params=params, headers=headers)
-            elif reqType == 'PUT':
-                ret = self.request_put(url, params=params, headers=headers)
+            ret = self.request(reqType, url, params=params, headers=headers)
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(ret)
 
