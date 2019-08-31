@@ -52,7 +52,9 @@ class binance:
             headers = {'X-MBX-APIKEY': self.APIkey}
             ret = self.request(reqType, url, params=params, headers=headers)
         loop = asyncio.get_event_loop()
-        return loop.run_until_complete(ret)
+        resp = loop.run_until_complete(ret)
+        loop.close()
+        return resp
 
 
 #1-PUBLIC API METHODS
