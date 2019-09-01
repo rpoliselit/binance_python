@@ -15,18 +15,35 @@ class binance:
 
     async def request(self, type, url, params, headers={}):
         async with aiohttp.ClientSession() as session:
-            if type == 'GET':
-                async with session.get(url, params=params, headers=headers) as response:
-                    return await response.json()
-            elif type == 'POST':
-                async with session.post(url, params=params, headers=headers) as response:
-                    return await response.json()
-            elif type == 'DELETE':
-                async with session.delete(url, params=params, headers=headers) as response:
-                    return await response.json()
-            elif type == 'PUT':
-                async with session.put(url, params=params, headers=headers) as response:
-                    return await response.json()
+            while True:
+                if type == 'GET':
+                    async with session.get(url, params=params, headers=headers) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            print(response.status)
+                            print(await response.text())
+                elif type == 'POST':
+                    async with session.post(url, params=params, headers=headers) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            print(response.status)
+                            print(await response.text())
+                elif type == 'DELETE':
+                    async with session.delete(url, params=params, headers=headers) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            print(response.status)
+                            print(await response.text())
+                elif type == 'PUT':
+                    async with session.put(url, params=params, headers=headers) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            print(response.status)
+                            print(await response.text())
 
     def api_query(self,command, params={}, reqType=None, privateAPI=False, signed=False):
 
@@ -52,9 +69,7 @@ class binance:
             headers = {'X-MBX-APIKEY': self.APIkey}
             ret = self.request(reqType, url, params=params, headers=headers)
         loop = asyncio.get_event_loop()
-        resp = loop.run_until_complete(ret)
-        loop.close()
-        return resp
+        return loop.run_until_complete(ret)
 
 
 #1-PUBLIC API METHODS
