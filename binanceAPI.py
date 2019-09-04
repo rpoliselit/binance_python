@@ -21,7 +21,7 @@ class binance:
             print(f"Error{error['code']}: {error['msg']}")
         else:
             print(response.status)
-            return await response.json()
+            print(await response.text())
 
     async def request(self, type, url, params, headers={}):
         async with aiohttp.ClientSession() as session:
