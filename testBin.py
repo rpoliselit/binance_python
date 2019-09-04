@@ -1,6 +1,5 @@
 from binanceAPI import binance
 import keys
-
 api = keys.binance_apikey
 secret = keys.binance_secret
 
