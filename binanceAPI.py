@@ -19,6 +19,10 @@ class binance:
         elif response.status == 400:
             error = await response.json()
             print(f"Error{error['code']}: {error['msg']}")
+        elif response.status == 443:
+            print("Connection reset by peer")
+        elif response.status == 504:
+            print("Gateway Time-out")
         else:
             print(response.status)
             print(await response.text())
