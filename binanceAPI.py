@@ -126,17 +126,18 @@ class binance:
 
 
 #2-PRIVATE API METHODS
-    def order(self, currencyPair, reqType, orderId=None, origClientOrderId=None, params={}):
+    def order(self, reqType, currencyPair=None, orderId=None, origClientOrderId=None, params={}):
         """
         Create order of any kind, i.e. buy, sell, cancel, status, and so on.
         :currencyPair: The currency pair, e.q. 'LTCBTC'.
         :orderId: a given order ID.
         :origClientOrderId:
         """
-        params['symbol'] = currencyPair
+        if currencyPair is not None:
+            params['symbol'] = currencyPair
         if orderId is not None:
             params['orderId'] = orderId
-        if origClientOrderId is None:
+        if origClientOrderId is not None:
             params['origClientOrderId'] = origClientOrderId
         return self.api_query('/order',privateAPI=True,signed=True,reqType=reqType,params=params)
 
@@ -305,7 +306,7 @@ class binance:
             params['icebergQty'] = str(icebergQty)
         if newOrderRespType is not None:
             params['newOrderRespType'] = newOrderRespType
-        return self.order(currencyPair,'POST',params=params)
+        return self.order('POST',params=params)
 
 
     #2.2.1-MARKET ORDERS
@@ -316,7 +317,7 @@ class binance:
         :quantity:
         NOTE: check 'newOrder' method in help.
         """
-        return self.newOrder(currencyPair,'BUY','MARKET',quantity)
+        return self.newOrder(currencyPair,'BUY','MARKET', quantity)
 
     def marketSell(self, currencyPair, quantity):
         """
@@ -325,7 +326,7 @@ class binance:
         :quantity:
         NOTE: check 'newOrder' method in help.
         """
-        return self.newOrder(currencyPair,'SELL','MARKET',quantity)
+        return self.newOrder(currencyPair,'SELL','MARKET', quantity)
 
     def stopLossBuy(self, currencyPair, quantity, stopPrice):
         """
