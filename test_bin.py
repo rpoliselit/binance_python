@@ -9,13 +9,26 @@ client = binance(api, secret)
 #public methods
 print(client.ping())
 # print(client.serverTime())
-# print(client.eInfo())
+symbols = client.eInfo()['symbols']
+for k in symbols:
+    if k['symbol'] == 'TUSDUSDT':
+        for j in k['filters']:
+            if j['filterType'] == 'LOT_SIZE':
+                minQty = float(j['minQty'])
+                maxQty = float(j['maxQty'])
+                stepSize = float(j['stepSize'])
+q = 126.65
+print(f'{q} / {stepSize} == {q / stepSize}')
+print(f'{q} // {stepSize} == {q // stepSize}')
+print(f'{q} % {stepSize} == {(q - minQty) % stepSize}')
+print(q - q % stepSize)
 # print(client.rPrice('LTCBTC'))
 # print(client.rAllPrices())
 print(client.rOrderBook('LTCBTC',10,'asks'))
 # print(client.bookTicker('LTCBTC','askPrice'))
 # print(client.aInfo('balances'))
-print(client.rBalances('DASH','asset'))
+print(client.rBalances('TUSD'))
+print(client.rBalances('USDT'))
 print(client.testOrder('LTCBTC','BUY','MARKET',0.1))
 # print(client.marketBuy('LTCBTC','BUY','MARKET',0.1))
 # print(client.marketBuy('LTCBTC','BUY','MARKET',0.1))
