@@ -1,4 +1,4 @@
-from binanceAPI import binance
+from binance_api import binance
 import keys
 api = keys.binance_apikey
 secret = keys.binance_secret
