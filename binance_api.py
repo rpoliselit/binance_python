@@ -185,6 +185,20 @@ class binance:
             balance = x
         return balance
 
+    def rTaker(self):
+        """
+        Returns taker commission in percentage. For instance, if commission is of 0.1% the value exhibited is 0.001.
+        """
+        taker = self.aInfo('takerCommission') / 10000
+        return taker
+
+    def rMaker(self):
+        """
+        Returns maker commission in percentage. For instance, if commission is of 0.1% the value exhibited is 0.001.
+        """
+        maker = self.aInfo('takerCommission') / 10000
+        return maker
+
     def orderStatus(self, currency_pair, order_id, orig_client_order_id):
         """
         Check an order's status.

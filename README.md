@@ -40,6 +40,7 @@ From now on we have all the methods described, exemplified, and ordered as the s
   - [Book ticker](#book-ticker)
   - [Account info](#account-info)
   - [Account balances](#account-balances)
+  - [Maker and taker commissions](#maker-and-taker-comissions)
   - [Order status](#order-status)
 - [DONATE](#donate)
 
@@ -145,7 +146,7 @@ field | No
 
 Example:
 ```
-client.aInfo()
+client.aInfo(`takerCommission`)
 ```
 
 ### Account balances
@@ -160,7 +161,18 @@ status | No
 
 Example:
 ```
-client.rBalances()
+client.rBalances('DCR')
+```
+
+### Maker and taker commissions
+Returns taker/maker commission in percentage. For instance, if commission is of 0.1% the value exhibited is 0.001.
+
+Examples:
+```
+client.rTaker()
+```
+```
+client.rMaker()
 ```
 
 ### Order status
