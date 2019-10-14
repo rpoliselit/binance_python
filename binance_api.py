@@ -99,7 +99,7 @@ class binance:
         """
         return self.api_query('/ticker/allPrices')
 
-    def rOrderBook(self, currency_pair, depth=5, field=None):
+    def rOrderBook(self, currency_pair, depth=100, field=None):
         """
         Returns the order book for a given market.
         :currency_pair: The currency pair, e.q. 'LTCBTC'.
