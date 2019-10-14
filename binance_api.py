@@ -44,7 +44,6 @@ class binance:
         url_api = 'https://api.binance.com/api'
         url_public = url_api + '/v1'
         url_private = url_api + '/v3'
-        list1 = ('/ping', '/time', '/exchangeInfo')
         timestamp = int(time.time()*1000)
         recvWindow = 5000
         if private_api == False:
