@@ -141,8 +141,16 @@ class binance:
 
 
     #2.1-requests GET
-    def bookTicker(self, currency_pair, field=None):
-        params = {'symbol': currency_pair}
+    def bookTicker(self, currency_pair=None, field=None):
+        """
+        Best price and quantity on the order book for a symbol or symbols.
+        :currency_pair (optional): The symbol of a given market, e.q. 'LTCBTC'
+        :field (optional): 'symbol', 'bidPrice', 'bidQty', 'askPrice', and 'askQty'.
+        """
+        if currency_pair is not None:
+            params = {'symbol': currency_pair}
+        else:
+            params = {}
         x = self.api_query('/ticker/bookTicker', params=params, private_api=True)
         if field is not None:
             x = x[field]
