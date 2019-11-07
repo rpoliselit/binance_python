@@ -90,8 +90,8 @@ class binance:
         :currency_pair: The currency pair, e.q. 'LTCBTC'.
         """
         params = {'symbol': currency_pair}
-        x = self.api_query('/ticker/price', params=params)
-        return float(x['price'])
+        price = self.api_query('/ticker/price', params=params)
+        return float(price['price'])
 
     def rAllPrices(self):
         """
@@ -117,7 +117,7 @@ class binance:
                 for elem in value:
                     for c, num in enumerate(elem):
                         elem[c] = float(num)
-        if field is not None and field in order_book:
+        if field != None and field in order_book:
             return order_book[field]
         else:
             return order_book
@@ -131,11 +131,11 @@ class binance:
         :order_id: a given order ID.
         :orig_client_order_id:
         """
-        if currency_pair is not None:
+        if currency_pair != None:
             params['symbol'] = currency_pair
-        if order_id is not None:
+        if order_id != None:
             params['orderId'] = order_id
-        if orig_client_order_id is not None:
+        if orig_client_order_id != None:
             params['origClientOrderId'] = orig_client_order_id
         return self.api_query('/order',private_api=True,signed=True,request_type=request_type,params=params)
 
@@ -147,26 +147,26 @@ class binance:
         :currency_pair (optional): The symbol of a given market, e.q. 'LTCBTC'
         :field (optional): 'symbol', 'bidPrice', 'bidQty', 'askPrice', and 'askQty'.
         """
-        if currency_pair is not None:
+        if currency_pair != None:
             params = {'symbol': currency_pair}
         else:
             params = {}
-        x = self.api_query('/ticker/bookTicker', params=params, private_api=True)
-        if field is not None:
-            x = x[field]
+        book_ticker = self.api_query('/ticker/bookTicker', params=params, private_api=True)
+        if field != None:
+            book_ticker = book_ticker[field]
             if field != 'symbol':
-                x = float(x)
-        return x
+                book_ticker = float(book_ticker)
+        return book_ticker
 
     def aInfo(self, field=None):
         """
         Get current account information.
         :field (optional): 'balances', 'makerCommission', 'takerCommission', 'buyerCommission', 'sellerCommission', 'canTrade', 'canWithdraw', 'canDeposit', 'updateTime', and 'accountType'.
         """
-        x = self.api_query('/account', params={}, private_api=True, signed=True, request_type='GET')
-        if field is not None and x is not None:
-            x = x[field]
-        return x
+        info = self.api_query('/account', params={}, private_api=True, signed=True, request_type='GET')
+        if field != None and info != None:
+            info = info[field]
+        return info
 
     def rBalances(self, asset=None, status='free'):
         """
@@ -174,15 +174,15 @@ class binance:
         :asset (optional): A given currency.
         :status (default=free): 'asset' confirms our currency, 'free' and 'locked' amount of the given asset.
         """
-        x = self.aInfo('balances')
-        if asset is not None and x is not None:
-            for c, k in enumerate(x):
+        balances = self.aInfo('balances')
+        if asset != None and balances != None:
+            for c, k in enumerate(balances):
                 if k['asset'] == asset and status in {'free', 'locked'}:
-                    balance = float(x[c][status])
+                    balance = float(balances[c][status])
                 elif k['asset'] == asset:
-                    balance = x[c][status]
+                    balance = balances[c][status]
         else:
-            balance = x
+            balance = balances
         return balance
 
     def rTaker(self):
@@ -208,7 +208,7 @@ class binance:
 
     def openOrders(self,currency_pair=None):
         params = {}
-        if currency_pair is not None:
+        if currency_pair != None:
             params['symbol'] = currency_pair
         return self.api_query('/openOrders',private_api=True,signed=True,request_type='GET',params=params)
 
@@ -221,11 +221,11 @@ class binance:
         :end (optional): end time.
         """
         params = {'symbol':currency_pair}
-        if order_id is not None:
+        if order_id != None:
             params['orderId'] = order_id
-        if start is not None:
+        if start != None:
             params['startTime'] = start
-        if end is not None:
+        if end != None:
             params['endTime'] = end
         return self.api_query('/allOrders',private_api=True,signed=True,request_type='GET',params=params)
 
@@ -237,9 +237,9 @@ class binance:
         :end (optional): end time.
         """
         params = {'symbol':currency_pair}
-        if startT is not None:
+        if start != None:
             params['startTime'] = start
-        if endT is not None:
+        if end != None:
             params['endTime'] = end
         return self.api_query('/myTrades',private_api=True,signed=True,request_type='GET',params=params)
 
@@ -264,15 +264,15 @@ class binance:
             'type' : type,
             'quantity' : str(quantity),
         }
-        if timeInForce is not None:
+        if timeInForce != None:
             params['timeInForce'] = timeInForce
-        if price is not None:
+        if price != None:
             params['price'] = str(price)
-        if stopPrice is not None:
+        if stopPrice != None:
             params['stopPrice'] = str(stopPrice)
-        if icebergQty is not None:
+        if icebergQty != None:
             params['icebergQty'] = str(icebergQty)
-        if newOrderRespType is not None:
+        if newOrderRespType != None:
             params['newOrderRespType'] = newOrderRespType
         return self.api_query('/order/test',private_api=True,signed=True,request_type='POST',params=params)
 
@@ -316,15 +316,15 @@ class binance:
             'type' : type,
             'quantity' : str(quantity),
         }
-        if timeInForce is not None:
+        if timeInForce != None:
             params['timeInForce'] = timeInForce
-        if price is not None:
+        if price != None:
             params['price'] = str(price)
-        if stopPrice is not None:
+        if stopPrice != None:
             params['stopPrice'] = str(stopPrice)
-        if icebergQty is not None:
+        if icebergQty != None:
             params['icebergQty'] = str(icebergQty)
-        if newOrderRespType is not None:
+        if newOrderRespType != None:
             params['newOrderRespType'] = newOrderRespType
         return self.order('POST',params=params)
 
