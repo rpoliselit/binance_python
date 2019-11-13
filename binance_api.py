@@ -6,14 +6,18 @@ from urllib.parse import urlencode
 
 class binance:
 
-    def __init__(self, APIkey, Secret):
+    def __init__(self, APIkey=None, Secret=None):
         """
         Client.
         """
         self.APIkey = APIkey
         self.Secret = Secret
 
-    async def response_status(self, response):
+    def __repr__(self):
+            signature = self.APIkey != None and self.Secret != None
+            return "{}igned Binance API".format("S" if signature else "Uns")
+
+    async def _response_status(self, response):
         if response.status == 200:
             return await response.json()
         elif response.status == 400:
@@ -27,7 +31,7 @@ class binance:
             print(response.status)
             print(await response.text())
 
-    async def request(self, type, url, params, headers={}):
+    async def _request(self, type, url, params, headers={}):
         async with aiohttp.ClientSession() as session:
             if type == 'GET':
                 resp = await session.get(url, params=params, headers=headers)
@@ -37,9 +41,9 @@ class binance:
                 resp = await session.delete(url, params=params, headers=headers)
             elif type == 'PUT':
                 resp = await session.put(url, params=params, headers=headers)
-            return await self.response_status(resp)
+            return await self._response_status(resp)
 
-    def api_query(self,command, params={}, request_type=None, private_api=False, signed=False):
+    def _api_query(self,command, params={}, request_type=None, private_api=False, signed=False):
 
         url_api = 'https://api.binance.com/api'
         url_public = url_api + '/v1'
@@ -48,10 +52,10 @@ class binance:
         recvWindow = 5000
         if private_api == False:
             url = url_public + command
-            ret = self.request('GET', url, params=params)
+            ret = self._request('GET', url, params=params)
         elif private_api == True and signed == False:
             url = url_private + command
-            ret = self.request('GET', url, params=params)
+            ret = self._request('GET', url, params=params)
         elif signed == True:
             url = url_private + command
             params['timestamp'] = timestamp
@@ -60,7 +64,7 @@ class binance:
             sign = hmac.new(self.Secret.encode('UTF-8'), query_string.encode('UTF-8'), hashlib.sha256)
             params['signature'] = sign.hexdigest()
             headers = {'X-MBX-APIKEY': self.APIkey}
-            ret = self.request(request_type, url, params=params, headers=headers)
+            ret = self._request(request_type, url, params=params, headers=headers)
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(ret)
 
@@ -70,19 +74,19 @@ class binance:
         """
         Test connectivity to the Rest API.
         """
-        return self.api_query('/ping')
+        return self._api_query('/ping')
 
     def serverTime(self):
         """
         Test connectivity to the Rest API and get the current server time.
         """
-        return self.api_query('/time')['serverTime']
+        return self._api_query('/time')['serverTime']
 
     def eInfo(self):
         """
         Current exchange trading rules and symbol information.
         """
-        return self.api_query('/exchangeInfo')
+        return self._api_query('/exchangeInfo')
 
     def rPrice(self, currency_pair):
         """
@@ -90,14 +94,14 @@ class binance:
         :currency_pair: The currency pair, e.q. 'LTCBTC'.
         """
         params = {'symbol': currency_pair}
-        price = self.api_query('/ticker/price', params=params)
+        price = self._api_query('/ticker/price', params=params)
         return float(price['price'])
 
     def rAllPrices(self):
         """
         Latest price for all symbols.
         """
-        return self.api_query('/ticker/allPrices')
+        return self._api_query('/ticker/allPrices')
 
     def rOrderBook(self, currency_pair, depth=100, field=None):
         """
@@ -111,7 +115,7 @@ class binance:
             'symbol': currency_pair,
             'limit': depth
         }
-        order_book = self.api_query('/depth', params=params)
+        order_book = self._api_query('/depth', params=params)
         for key, value in order_book.items():
             if key in ['asks','bids']:
                 for elem in value:
@@ -124,7 +128,7 @@ class binance:
 
 
 #2-PRIVATE API METHODS
-    def order(self, request_type, currency_pair=None, order_id=None, orig_client_order_id=None, params={}):
+    def _order(self, request_type, currency_pair=None, order_id=None, orig_client_order_id=None, params={}):
         """
         Create order of any kind, i.e. buy, sell, cancel, status, and so on.
         :currency_pair: The currency pair, e.q. 'LTCBTC'.
@@ -137,7 +141,7 @@ class binance:
             params['orderId'] = order_id
         if orig_client_order_id != None:
             params['origClientOrderId'] = orig_client_order_id
-        return self.api_query('/order',private_api=True,signed=True,request_type=request_type,params=params)
+        return self._api_query('/order',private_api=True,signed=True,request_type=request_type,params=params)
 
 
     #2.1-requests GET
@@ -151,7 +155,7 @@ class binance:
             params = {'symbol': currency_pair}
         else:
             params = {}
-        book_ticker = self.api_query('/ticker/bookTicker', params=params, private_api=True)
+        book_ticker = self._api_query('/ticker/bookTicker', params=params, private_api=True)
         if field != None:
             book_ticker = book_ticker[field]
             if field != 'symbol':
@@ -163,7 +167,7 @@ class binance:
         Get current account information.
         :field (optional): 'balances', 'makerCommission', 'takerCommission', 'buyerCommission', 'sellerCommission', 'canTrade', 'canWithdraw', 'canDeposit', 'updateTime', and 'accountType'.
         """
-        info = self.api_query('/account', params={}, private_api=True, signed=True, request_type='GET')
+        info = self._api_query('/account', params={}, private_api=True, signed=True, request_type='GET')
         if field != None and info != None:
             info = info[field]
         return info
@@ -204,13 +208,13 @@ class binance:
         Check an order's status.
         NOTE: check 'order' method in help.
         """
-        return self.order(currency_pair,'GET', order_id=order_id, orig_client_order_id=orig_client_order_id)
+        return self._order(currency_pair,'GET', order_id=order_id, orig_client_order_id=orig_client_order_id)
 
     def openOrders(self,currency_pair=None):
         params = {}
         if currency_pair != None:
             params['symbol'] = currency_pair
-        return self.api_query('/openOrders',private_api=True,signed=True,request_type='GET',params=params)
+        return self._api_query('/openOrders',private_api=True,signed=True,request_type='GET',params=params)
 
     def allOrders(self, currency_pair, order_id=None, start=None, end=None):
         """
@@ -227,7 +231,7 @@ class binance:
             params['startTime'] = start
         if end != None:
             params['endTime'] = end
-        return self.api_query('/allOrders',private_api=True,signed=True,request_type='GET',params=params)
+        return self._api_query('/allOrders',private_api=True,signed=True,request_type='GET',params=params)
 
     def myTrades(self, currency_pair, start=None, end=None,):
         """
@@ -241,7 +245,7 @@ class binance:
             params['startTime'] = start
         if end != None:
             params['endTime'] = end
-        return self.api_query('/myTrades',private_api=True,signed=True,request_type='GET',params=params)
+        return self._api_query('/myTrades',private_api=True,signed=True,request_type='GET',params=params)
 
 
     #2.2-requests POST
@@ -274,7 +278,7 @@ class binance:
             params['icebergQty'] = str(icebergQty)
         if newOrderRespType != None:
             params['newOrderRespType'] = newOrderRespType
-        return self.api_query('/order/test',private_api=True,signed=True,request_type='POST',params=params)
+        return self._api_query('/order/test',private_api=True,signed=True,request_type='POST',params=params)
 
     def newOrder(self, currency_pair, side, type, quantity, timeInForce=None, price=None, stopPrice=None, icebergQty=None, newOrderRespType=None):
         """
@@ -326,7 +330,7 @@ class binance:
             params['icebergQty'] = str(icebergQty)
         if newOrderRespType != None:
             params['newOrderRespType'] = newOrderRespType
-        return self.order('POST',params=params)
+        return self._order('POST',params=params)
 
 
     #2.2.1-MARKET ORDERS
@@ -375,7 +379,7 @@ class binance:
         Cancel an active order.
         NOTE: check 'order' method in help.
         """
-        return self.order(currency_pair, order_id, orig_client_order_id, request_type='DELETE')
+        return self._order(currency_pair, order_id, orig_client_order_id, request_type='DELETE')
 
 
     #2.4-requests PUT
