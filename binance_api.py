@@ -145,16 +145,21 @@ class binance:
 
 
     #2.1-requests GET
+    def r24hTicker(self, currency_pair=None):
+        params = {}
+        if currency_pair != None:
+            params = {'symbol' : currency_pair}
+        return self._api_query('/ticker/24hr', params = params, private_api=True)
+
     def bookTicker(self, currency_pair=None, field=None):
         """
         Best price and quantity on the order book for a symbol or symbols.
         :currency_pair (optional): The symbol of a given market, e.q. 'LTCBTC'
         :field (optional): 'symbol', 'bidPrice', 'bidQty', 'askPrice', and 'askQty'.
         """
+        params = {}
         if currency_pair != None:
             params = {'symbol': currency_pair}
-        else:
-            params = {}
         book_ticker = self._api_query('/ticker/bookTicker', params=params, private_api=True)
         if field != None:
             book_ticker = book_ticker[field]
@@ -379,7 +384,10 @@ class binance:
         Cancel an active order.
         NOTE: check 'order' method in help.
         """
-        return self._order(currency_pair, order_id, orig_client_order_id, request_type='DELETE')
+        return self._order(request_type='DELETE',
+                           currency_pair=currency_pair,
+                           order_id=order_id,
+                           orig_client_order_id=orig_client_order_id)
 
 
     #2.4-requests PUT
