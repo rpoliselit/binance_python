@@ -106,7 +106,7 @@ class binance:
     def rOrderBook(self, currency_pair, depth=100, field=None):
         """
         Returns the order book for a given market.
-        :currency_pair: The currency pair, e.q. 'LTCBTC'.
+        :currency_pair: The currency pair, e.g. 'LTCBTC'.
         :depth (default = 5): weight limit.
         :field (optional): Information from a specific field, such as 'lastUpdatedId', 'bids', 'asks'.
         Caution: setting limit=0 can return a lot of data.
@@ -125,6 +125,22 @@ class binance:
             return order_book[field]
         else:
             return order_book
+
+    def rKlineData(self, currency_pair, interval):
+        """
+        Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
+        :currency_pair: The currency pair, e.g. 'LTCBTC'.
+        :interval: 1m, 3m, 5m, 15m 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
+        :start:
+        :end:
+        :limit (default = 500, max = 1000):
+        NOTE: If startTime and endTime are not sent, the most recent klines are returned.
+        """
+        params = {
+            'symbol' : currency_pair,
+            'interval' : interval
+        }
+        return self._api_query('/klines',params=params)
 
 
 #2-PRIVATE API METHODS
