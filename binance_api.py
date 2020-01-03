@@ -126,7 +126,7 @@ class binance:
         else:
             return order_book
 
-    def rKlineData(self, currency_pair, interval):
+    def rKlineData(self, currency_pair, interval, start=None, end=None, limit=500):
         """
         Kline/candlestick bars for a symbol. Klines are uniquely identified by their open time.
         :currency_pair: The currency pair, e.g. 'LTCBTC'.
@@ -134,13 +134,17 @@ class binance:
         :start:
         :end:
         :limit (default = 500, max = 1000):
-        NOTE: If startTime and endTime are not sent, the most recent klines are returned.
+        NOTE: If start and end are not sent, the most recent klines are returned.
         """
         params = {
             'symbol' : currency_pair,
-            'interval' : interval
+            'interval' : interval,
+            'limit' : limit
         }
-        return self._api_query('/klines',params=params)
+        if start != None and end != None:
+            params['startTime'] = start
+            params['endTime'] = end
+        return self._api_query('/klines',params=params,private_api=True)
 
 
 #2-PRIVATE API METHODS

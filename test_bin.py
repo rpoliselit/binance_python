@@ -1,4 +1,5 @@
 from binance_api import binance
+import time
 import keys
 api = keys.binance_apikey
 secret = keys.binance_secret
@@ -6,6 +7,8 @@ secret = keys.binance_secret
 client = binance(api, secret)
 # print(client)
 
+now = int(time.time() * 1000)
+month_ago = now - 60*60*24 * 31 * 1000
 #public methods
 print(client.ping())
 # print(client.serverTime())
@@ -14,7 +17,8 @@ print(client.ping())
 # print(client.rOrderBook('LTCBTC',10,'asks'))
 # print(client.rTaker())
 # print(client.rMaker())
-print(client.rKlineData('LTCBTC','1d'))
+print(len(client.rKlineData('LTCBTC','1M')))
+print(client.rKlineData('LTCBTC','1M',start=month_ago,end=now))
 # print(client.bookTicker('LTCBTC','askPrice'))
 # print(client.aInfo('balances'))
 # print(client.rBalances('TUSD'))
